@@ -1,6 +1,6 @@
 import React, {useState} from 'react'
 import {Link, useNavigate} from 'react-router-dom'
-import {Settings, LogOut, X, CheckSquare, List} from 'lucide-react'
+import {Settings, LogOut, CheckSquare, List} from 'lucide-react'
 import {Avatar, AvatarImage, AvatarFallback} from '@/components/ui/avatar'
 import {
     DropdownMenu,
@@ -35,7 +35,7 @@ export default function DashboardHeader({
         <>
             <header className="bg-primary text-primary-foreground py-4 px-6 flex justify-between items-center">
                 <div className="flex items-center space-x-6">
-                    <h1 className="text-2xl font-bold">{title}</h1>
+                    <Link to='/'><h1 className="text-2xl font-bold">{title}</h1></Link>
                     <nav className="flex space-x-4">
                         <Button variant="ghost" asChild>
                             <Link to="/dashboard" className="flex items-center">

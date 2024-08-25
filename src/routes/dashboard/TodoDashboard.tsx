@@ -25,6 +25,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select"
+import {Footer} from "@/components/footer.tsx";
 
 interface Todo {
     id: string
@@ -261,6 +262,8 @@ export default function TodoDashboard() {
                     </DialogFooter>
                 </DialogContent>
             </Dialog>
+
+            <Footer />
         </div>
     )
 }

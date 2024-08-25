@@ -4,7 +4,6 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Checkbox } from "@/components/ui/checkbox"
 import {ModeToggle} from "@/components/mode-toggle.tsx";
-
 export default function AuthPage() {
     const [isLogin, setIsLogin] = useState(true)
     const [email, setEmail] = useState('')
@@ -135,39 +134,44 @@ export default function AuthPage() {
     )
 
     return (
-        <div className="flex flex-col md:flex-row h-screen">
-            {/* Left side - Image */}
-            <div className="w-full md:w-1/2 relative">
-                <img
-                    src="https://picsum.photos/1080/1025"
-                    alt="Auth visual"
-                />
-            </div>
+        <>
+            <div className="flex flex-col md:flex-row h-screen">
+                {/* Left side - Image */}
+                <div className="w-full md:w-1/2 relative">
+                    <img
+                        src="https://picsum.photos/1080/1025"
+                        alt="Auth visual"
+                    />
+                </div>
 
-            {/* Right side - Auth Form */}
-            <div className="w-full md:w-1/2 flex items-center justify-center p-8 bg-background">
+                {/* Right side - Auth Form */}
+                <div className="w-full md:w-1/2 flex items-center justify-center p-8 bg-background">
 
-                <div className="w-full max-w-md space-y-8">
-                    <ModeToggle />
-                    <div className="text-center">
-                        <h2 className="text-3xl font-bold tracking-tight">
-                            {isLogin ? 'Welcome back' : 'Create an account'}
-                        </h2>
-                        <p className="mt-2 text-sm text-muted-foreground">
-                            {isLogin ? 'Please sign in to your account' : 'Please sign up for an account'}
+                    <div className="w-full max-w-md space-y-8">
+                        <ModeToggle />
+                        <div className="text-center">
+                            <h2 className="text-3xl font-bold tracking-tight">
+                                {isLogin ? 'Welcome back' : 'Create an account'}
+                            </h2>
+                            <p className="mt-2 text-sm text-muted-foreground">
+                                {isLogin ? 'Please sign in to your account' : 'Please sign up for an account'}
+                            </p>
+                        </div>
+
+                        {isLogin ? <LoginForm /> : <RegisterForm />}
+
+                        <p className="mt-2 text-center text-sm text-muted-foreground">
+                            {isLogin ? "Not a member? " : "Already have an account? "}
+                            <a href="#" className="font-medium text-primary hover:underline" onClick={toggleForm}>
+                                {isLogin ? "Sign up now" : "Sign in"}
+                            </a>
                         </p>
                     </div>
-
-                    {isLogin ? <LoginForm /> : <RegisterForm />}
-
-                    <p className="mt-2 text-center text-sm text-muted-foreground">
-                        {isLogin ? "Not a member? " : "Already have an account? "}
-                        <a href="#" className="font-medium text-primary hover:underline" onClick={toggleForm}>
-                            {isLogin ? "Sign up now" : "Sign in"}
-                        </a>
-                    </p>
                 </div>
             </div>
-        </div>
-    )
+            <Footer />
+        </>
+)
 }
+
+import {Footer} from "@/components/footer.tsx";

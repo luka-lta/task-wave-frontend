@@ -31,6 +31,7 @@ import {toast} from '@/components/ui/use-toast'
 import DashboardHeader from "@/components/dashboard-header.tsx";
 import {Badge} from "@/components/ui/badge.tsx";
 import AddCategoryDialog from "@/components/dialog/add-category.tsx";
+import {Footer} from "@/components/footer.tsx";
 
 interface Category {
     id: number
@@ -50,8 +51,6 @@ export default function CategoriesPage() {
     const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
     const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
     const [newCategoryName, setNewCategoryName] = useState('')
-    const [newCategoryDescription, setNewCategoryDescription] = useState('')
-    const [newCategoryColor, setNewCategoryColor] = useState('f0134d')
     const [editingCategory, setEditingCategory] = useState<Category | null>(null)
     const [deletingCategoryId, setDeletingCategoryId] = useState<number | null>(null)
 
@@ -231,6 +230,8 @@ export default function CategoriesPage() {
                     </AlertDialogContent>
                 </AlertDialog>
             </div>
+
+            <Footer />
         </>
     )
 }
