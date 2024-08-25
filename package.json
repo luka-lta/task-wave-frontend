@@ -1,6 +1,5 @@
 {
-  "name": "my-vue-app",
-  "private": true,
+  "name": "task-wave-frontend",
   "version": "0.0.0",
   "type": "module",
   "scripts": {
