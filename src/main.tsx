@@ -7,6 +7,8 @@ import {ThemeProvider} from "@/components/theme-provider.tsx";
 import Login from "@/routes/Login.tsx";
 import TodoDashboard from "@/routes/dashboard/TodoDashboard.tsx";
 import CategoriesPage from "@/routes/dashboard/CategoriesDashboard.tsx";
+import ForgotPassword from "@/routes/forgot-password.tsx";
+import NewPassword from "@/routes/new-password.tsx";
 
 const router = createBrowserRouter([
     {
@@ -16,6 +18,14 @@ const router = createBrowserRouter([
     {
         path: '/login',
         element: <Login/>
+    },
+    {
+        path: '/forgot-password',
+        element: <ForgotPassword/>
+    },
+    {
+        path: '/new-password',
+        element: <NewPassword/>
     },
     {
         path: '/dashboard',

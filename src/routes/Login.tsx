@@ -68,7 +68,7 @@ export default function AuthPage() {
                 </div>
 
                 <div className="text-sm">
-                    <a href="#" className="font-medium text-primary hover:underline">
+                    <a href="/forgot-password" className="font-medium text-primary hover:underline">
                         Forgot password?
                     </a>
                 </div>
