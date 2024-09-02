@@ -12,11 +12,7 @@ import {Footer} from "@/components/footer.tsx";
 import AddCategoryDialog from "@/components/dialog/category/add-category.tsx";
 
 export default function CategoriesPage() {
-    const { categories, isLoading, addCategory, editCategory, deleteCategory } = useCategories([
-        { id: 1, name: 'Work', description: 'Work related tasks', color: '5f2eea' },
-        { id: 2, name: 'Personal', description: 'Personal tasks', color: 'f0134d' },
-        { id: 3, name: 'Shopping', description: 'Shopping list', color: 'f59e0b' },
-    ]);
+    const { categories, isLoading, addCategory, editCategory, deleteCategory } = useCategories([]);
 
     const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
     const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
@@ -43,7 +39,7 @@ export default function CategoriesPage() {
                     </TableHeader>
                     <TableBody>
                         {categories.map(category => (
-                            <TableRow key={category.id}>
+                            <TableRow key={category.categoryId}>
                                 <TableCell>{category.name}</TableCell>
                                 <TableCell>{category.description}</TableCell>
                                 <TableCell>
@@ -67,7 +63,7 @@ export default function CategoriesPage() {
                                         variant="ghost"
                                         size="sm"
                                         onClick={() => {
-                                            setDeletingCategoryId(category.id)
+                                            setDeletingCategoryId(category.categoryId)
                                             setIsDeleteDialogOpen(true)
                                         }}
                                     >

@@ -29,7 +29,7 @@ export const EditCategoryDialog: React.FC<EditCategoryDialogProps> = ({
                                                                           isLoading
                                                                       }) => {
     const [categoryData, setCategoryData] = useState<Category>(category || {
-        id: 0,
+        categoryId: 0,
         name: '',
         description: '',
         color: '',
