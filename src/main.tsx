@@ -9,6 +9,7 @@ import TodoDashboard from "@/routes/dashboard/TodoDashboard.tsx";
 import CategoriesPage from "@/routes/dashboard/CategoriesDashboard.tsx";
 import ForgotPassword from "@/routes/forgot-password.tsx";
 import NewPassword from "@/routes/new-password.tsx";
+import {AuthProvider} from "@/context/auth-context.tsx";
 
 const router = createBrowserRouter([
     {
@@ -39,8 +40,10 @@ const router = createBrowserRouter([
 
 createRoot(document.getElementById('root')!).render(
     <StrictMode>
-        <ThemeProvider defaultTheme="dark" storageKey="ui-theme">
-            <RouterProvider router={router}/>
-        </ThemeProvider>
+        <AuthProvider>
+            <ThemeProvider defaultTheme="dark" storageKey="ui-theme">
+                <RouterProvider router={router}/>
+            </ThemeProvider>
+        </AuthProvider>
     </StrictMode>,
 )

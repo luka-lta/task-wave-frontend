@@ -40,7 +40,7 @@ export default function DashboardHeader({
                         <Button variant="ghost" asChild>
                             <Link to="/dashboard" className="flex items-center">
                                 <CheckSquare className="mr-2 h-4 w-4" />
-                                ToDos
+                                Tasks
                             </Link>
                         </Button>
                         <Button variant="ghost" asChild>

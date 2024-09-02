@@ -1,7 +1,7 @@
-import React, { useState } from 'react'
-import { Loader2 } from 'lucide-react'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
+import React, {useState} from 'react';
+import {Loader2} from 'lucide-react';
+import {Button} from '@/components/ui/button';
+import {Input} from '@/components/ui/input';
 import {
     Dialog,
     DialogContent,
@@ -9,24 +9,44 @@ import {
     DialogFooter,
     DialogHeader,
     DialogTitle,
-} from '@/components/ui/dialog'
-import { Label } from '@/components/ui/label'
+} from '@/components/ui/dialog';
+import {Label} from '@/components/ui/label';
 
 interface AddCategoryDialogProps {
-    isOpen: boolean
-    onClose: () => void
-    onAddCategory: (name: string, description: string, color: string) => void
-    isLoading: boolean
+    isOpen: boolean;
+    onClose: () => void;
+    onAddCategory: (name: string, description: string, color: string) => void;
+    isLoading: boolean;
 }
 
-export default function AddCategoryDialog({ isOpen, onClose, onAddCategory, isLoading }: AddCategoryDialogProps) {
-    const [newCategoryName, setNewCategoryName] = useState('')
-    const [newCategoryDescription, setNewCategoryDescription] = useState('')
-    const [newCategoryColor, setNewCategoryColor] = useState('000000')
+export default function AddCategoryDialog({
+                                              isOpen,
+                                              onClose,
+                                              onAddCategory,
+                                              isLoading,
+                                          }: AddCategoryDialogProps) {
+    const [formData, setFormData] = useState({
+        name: '',
+        description: '',
+        color: '000000',
+    });
+
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const {id, value} = e.target;
+        setFormData((prev) => ({
+            ...prev,
+            [id]: id === 'color' ? value.replace('#', '') : value,
+        }));
+    };
 
     const handleAddCategory = () => {
-        onAddCategory(newCategoryName, newCategoryDescription, newCategoryColor)
-    }
+        const {name, description, color} = formData;
+        if (!name.trim()) {
+            alert('Category name is required');
+            return;
+        }
+        onAddCategory(name, description, color);
+    };
 
     return (
         <Dialog open={isOpen} onOpenChange={onClose}>
@@ -44,8 +64,8 @@ export default function AddCategoryDialog({ isOpen, onClose, onAddCategory, isLo
                         </Label>
                         <Input
                             id="name"
-                            value={newCategoryName}
-                            onChange={(e) => setNewCategoryName(e.target.value)}
+                            value={formData.name}
+                            onChange={handleChange}
                             placeholder="Category name"
                             className="col-span-3"
                         />
@@ -56,8 +76,8 @@ export default function AddCategoryDialog({ isOpen, onClose, onAddCategory, isLo
                         </Label>
                         <Input
                             id="description"
-                            value={newCategoryDescription}
-                            onChange={(e) => setNewCategoryDescription(e.target.value)}
+                            value={formData.description}
+                            onChange={handleChange}
                             placeholder="Category description"
                             className="col-span-3"
                         />
@@ -70,19 +90,13 @@ export default function AddCategoryDialog({ isOpen, onClose, onAddCategory, isLo
                             <Input
                                 id="color"
                                 type="color"
-                                value={`#${newCategoryColor}`}
-                                onChange={(e) => {
-                                    const colorWithoutHash = e.target.value.replace('#', '')
-                                    setNewCategoryColor(colorWithoutHash)
-                                }}
+                                value={`#${formData.color}`}
+                                onChange={handleChange}
                                 className="h-10 w-10 p-0 border-none"
                             />
                             <Input
-                                value={`#${newCategoryColor}`}
-                                onChange={(e) => {
-                                    const colorWithoutHash = e.target.value.replace('#', '')
-                                    setNewCategoryColor(colorWithoutHash)
-                                }}
+                                value={`#${formData.color}`}
+                                onChange={handleChange}
                                 placeholder="#000000"
                                 className="flex-grow"
                             />
@@ -94,11 +108,11 @@ export default function AddCategoryDialog({ isOpen, onClose, onAddCategory, isLo
                         Cancel
                     </Button>
                     <Button onClick={handleAddCategory} disabled={isLoading}>
-                        {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                        {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin"/>}
                         Add Category
                     </Button>
                 </DialogFooter>
             </DialogContent>
         </Dialog>
-    )
+    );
 }

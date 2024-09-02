@@ -1,269 +1,213 @@
-import React, { useState } from 'react'
-import { format } from "date-fns"
-import { CalendarIcon, Pencil, Trash2 } from "lucide-react"
-import { Label } from "@/components/ui/label"
+"use client"
+
+import React, { useState } from "react"
+import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
-import { Button } from "@/components/ui/button"
-import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card"
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { Calendar } from "@/components/ui/calendar"
-import { cn } from "@/lib/utils"
-import DashboardHeader from "@/components/dashboard-header"
-import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-} from "@/components/ui/dialog"
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from "@/components/ui/select"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Switch } from "@/components/ui/switch"
+import { Label } from "@/components/ui/label"
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog"
+import { CalendarIcon, PencilIcon, PinIcon, PlusIcon, TrashIcon } from "lucide-react"
+import DashboardHeader from "@/components/dashboard-header.tsx";
 import {Footer} from "@/components/footer.tsx";
+import TaskItem from "@/components/items/TaskItem.tsx";
+
+type Priority = "Low" | "Medium" | "High"
+type Status = "Not Started" | "In Progress" | "Completed"
 
 interface Todo {
-    id: string
-    name: string
+    id: number
+    title: string
     description: string
-    deadline: Date
-    category: string
+    priority: Priority
+    status: Status
+    pinned: boolean
+    deadline: string
 }
 
-const categories = ['Work', 'Personal', 'Shopping', 'Health', 'Finance']
-
 export default function TodoDashboard() {
-    const [todos, setTodos] = useState<Todo[]>([
-        { id: '1', name: 'Buy groceries', description: 'Pick up milk, eggs, and bread', deadline: new Date(), category: 'Shopping' },
-        { id: '2', name: 'Clean the house', description: 'Vacuum, mop, and dust the entire house', deadline: new Date(), category: 'Personal' },
-        { id: '3', name: 'Call mom', description: 'Wish her a happy birthday', deadline: new Date(), category: 'Personal' },
-    ])
-    const [newTodo, setNewTodo] = useState<Partial<Todo>>({})
+    const [todos, setTodos] = useState<Todo[]>([])
     const [editingTodo, setEditingTodo] = useState<Todo | null>(null)
-    const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
+    const [isDialogOpen, setIsDialogOpen] = useState(false)
     const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
-    const [todoToDelete, setTodoToDelete] = useState<string | null>(null)
+    const [todoToDelete, setTodoToDelete] = useState<Todo | null>(null)
 
-    const handleCreateTodo = (e: React.FormEvent) => {
+    const [title, setTitle] = useState("")
+    const [description, setDescription] = useState("")
+    const [priority, setPriority] = useState<Priority>("Medium")
+    const [status, setStatus] = useState<Status>("Not Started")
+    const [pinned, setPinned] = useState(false)
+    const [deadline, setDeadline] = useState("")
+
+    const resetForm = () => {
+        setTitle("")
+        setDescription("")
+        setPriority("Medium")
+        setStatus("Not Started")
+        setPinned(false)
+        setDeadline("")
+        setEditingTodo(null)
+    }
+
+    const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault()
-        if (newTodo.name && newTodo.description && newTodo.deadline && newTodo.category) {
-            setTodos([...todos, { ...newTodo, id: Date.now().toString() } as Todo])
-            setNewTodo({})
-        }
-    }
-
-    const handleEditTodo = () => {
         if (editingTodo) {
-            setTodos(todos.map(todo => todo.id === editingTodo.id ? editingTodo : todo))
-            setIsEditDialogOpen(false)
-            setEditingTodo(null)
+            setTodos(
+                todos.map((todo) =>
+                    todo.id === editingTodo.id
+                        ? { ...todo, title, description, priority, status, pinned, deadline }
+                        : todo
+                )
+            )
+        } else {
+            const newTodo: Todo = {
+                id: Date.now(),
+                title,
+                description,
+                priority,
+                status,
+                pinned,
+                deadline,
+            }
+            setTodos([...todos, newTodo])
         }
+        resetForm()
+        setIsDialogOpen(false)
     }
 
-    const handleDeleteTodo = () => {
+    const handleEdit = (todo: Todo) => {
+        setEditingTodo(todo)
+        setTitle(todo.title)
+        setDescription(todo.description)
+        setPriority(todo.priority)
+        setStatus(todo.status)
+        setPinned(todo.pinned)
+        setDeadline(todo.deadline)
+        setIsDialogOpen(true)
+    }
+
+    const handleDelete = (todo: Todo) => {
+        setTodoToDelete(todo)
+        setIsDeleteDialogOpen(true)
+    }
+
+    const confirmDelete = () => {
         if (todoToDelete) {
-            setTodos(todos.filter(todo => todo.id !== todoToDelete))
+            setTodos(todos.filter((todo) => todo.id !== todoToDelete.id))
             setIsDeleteDialogOpen(false)
             setTodoToDelete(null)
         }
     }
 
-    const updateEditingTodo = (field: keyof Todo, value: string | Date) => {
-        if (editingTodo) {
-            setEditingTodo({ ...editingTodo, [field]: value })
-        }
+    const handleTogglePin = (id: number) => {
+        setTodos(todos.map((todo) => (todo.id === id ? { ...todo, pinned: !todo.pinned } : todo)))
     }
 
     return (
-        <div className="flex flex-col min-h-screen bg-background">
-            <DashboardHeader title='Dashboard' userAvatarUrl='https://picsum.photos/40/40'/>
-            <main className="flex-1 p-6">
-                <div className="max-w-4xl mx-auto">
-                    <Card className="mb-8">
-                        <CardHeader>
-                            <CardTitle>Create New Todo</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <form onSubmit={handleCreateTodo} className="space-y-4">
-                                <div className="space-y-2">
-                                    <Label htmlFor="name">Name</Label>
-                                    <Input
-                                        id="name"
-                                        value={newTodo.name || ''}
-                                        onChange={e => setNewTodo({...newTodo, name: e.target.value})}
-                                        placeholder="Enter todo name"
-                                    />
-                                </div>
-                                <div className="space-y-2">
-                                    <Label htmlFor="description">Description</Label>
-                                    <Textarea
-                                        id="description"
-                                        value={newTodo.description || ''}
-                                        onChange={e => setNewTodo({...newTodo, description: e.target.value})}
-                                        placeholder="Enter todo description"
-                                    />
-                                </div>
-                                <div className="space-y-2">
-                                    <Label>Deadline</Label>
-                                    <Popover>
-                                        <PopoverTrigger asChild>
-                                            <Button
-                                                variant={"outline"}
-                                                className={cn(
-                                                    "w-full justify-start text-left font-normal",
-                                                    !newTodo.deadline && "text-muted-foreground"
-                                                )}
-                                            >
-                                                <CalendarIcon className="mr-2 h-4 w-4"/>
-                                                {newTodo.deadline ? format(newTodo.deadline, "PPP") : <span>Pick a date</span>}
-                                            </Button>
-                                        </PopoverTrigger>
-                                        <PopoverContent className="w-auto p-0">
-                                            <Calendar
-                                                mode="single"
-                                                selected={newTodo.deadline}
-                                                onSelect={date => date && setNewTodo({...newTodo, deadline: date})}
-                                                initialFocus
-                                            />
-                                        </PopoverContent>
-                                    </Popover>
-                                </div>
-                                <div className="space-y-2">
-                                    <Label>Category</Label>
-                                    <Select onValueChange={value => setNewTodo({...newTodo, category: value})}>
-                                        <SelectTrigger>
-                                            <SelectValue placeholder="Select a category" />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            {categories.map(category => (
-                                                <SelectItem key={category} value={category}>{category}</SelectItem>
-                                            ))}
-                                        </SelectContent>
-                                    </Select>
-                                </div>
-                                <Button type="submit" className="w-full">Create Todo</Button>
-                            </form>
-                        </CardContent>
-                    </Card>
-
-                    <h2 className="text-2xl font-bold mb-4">Your Todos</h2>
-                    <div className="grid gap-4">
-                        {todos.map(todo => (
-                            <Card key={todo.id}>
-                                <CardHeader>
-                                    <CardTitle>{todo.name}</CardTitle>
-                                </CardHeader>
-                                <CardContent>
-                                    <p>{todo.description}</p>
-                                    <p className="mt-2"><strong>Deadline:</strong> {format(todo.deadline, "PPP")}</p>
-                                    <p><strong>Category:</strong> {todo.category}</p>
-                                </CardContent>
-                                <CardFooter className="justify-end space-x-2">
-                                    <Button variant="outline" onClick={() => {
-                                        setEditingTodo(todo)
-                                        setIsEditDialogOpen(true)
-                                    }}>
-                                        <Pencil className="w-4 h-4 mr-2" />
-                                        Edit
-                                    </Button>
-                                    <Button variant="destructive" onClick={() => {
-                                        setTodoToDelete(todo.id)
-                                        setIsDeleteDialogOpen(true)
-                                    }}>
-                                        <Trash2 className="w-4 h-4 mr-2" />
-                                        Delete
-                                    </Button>
-                                </CardFooter>
-                            </Card>
-                        ))}
-                    </div>
-                </div>
-            </main>
-
-            <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-                <DialogContent>
-                    <DialogHeader>
-                        <DialogTitle>Edit Todo</DialogTitle>
-                    </DialogHeader>
-                    {editingTodo && (
-                        <form onSubmit={e => { e.preventDefault(); handleEditTodo(); }} className="space-y-4">
-                            <div className="space-y-2">
-                                <Label htmlFor="edit-name">Name</Label>
-                                <Input
-                                    id="edit-name"
-                                    value={editingTodo.name}
-                                    onChange={e => updateEditingTodo('name', e.target.value)}
-                                />
+        <>
+            <DashboardHeader title={'Tasks'} />
+            <div className="container mx-auto p-4">
+                <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                    <DialogTrigger asChild>
+                        <Button className="mb-4">
+                            <PlusIcon className="mr-2 h-4 w-4" />
+                            Add New ToDo
+                        </Button>
+                    </DialogTrigger>
+                    <DialogContent>
+                        <DialogHeader>
+                            <DialogTitle>{editingTodo ? "Edit ToDo" : "Add New ToDo"}</DialogTitle>
+                        </DialogHeader>
+                        <form onSubmit={handleSubmit} className="space-y-4">
+                            <Input
+                                placeholder="Title"
+                                value={title}
+                                onChange={(e) => setTitle(e.target.value)}
+                                required
+                            />
+                            <Textarea
+                                placeholder="Description"
+                                value={description}
+                                onChange={(e) => setDescription(e.target.value)}
+                            />
+                            <Select value={priority} onValueChange={(value: Priority) => setPriority(value)}>
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Priority" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="Low">Low</SelectItem>
+                                    <SelectItem value="Medium">Medium</SelectItem>
+                                    <SelectItem value="High">High</SelectItem>
+                                </SelectContent>
+                            </Select>
+                            <Select value={status} onValueChange={(value: Status) => setStatus(value)}>
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Status" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="Not Started">Not Started</SelectItem>
+                                    <SelectItem value="In Progress">In Progress</SelectItem>
+                                    <SelectItem value="Completed">Completed</SelectItem>
+                                </SelectContent>
+                            </Select>
+                            <div className="flex items-center space-x-2">
+                                <Switch id="pinned" checked={pinned} onCheckedChange={setPinned} />
+                                <Label htmlFor="pinned">Pinned</Label>
                             </div>
-                            <div className="space-y-2">
-                                <Label htmlFor="edit-description">Description</Label>
-                                <Textarea
-                                    id="edit-description"
-                                    value={editingTodo.description}
-                                    onChange={e => updateEditingTodo('description', e.target.value)}
-                                />
-                            </div>
-                            <div className="space-y-2">
-                                <Label>Deadline</Label>
-                                <Popover>
-                                    <PopoverTrigger asChild>
-                                        <Button variant={"outline"} className="w-full justify-start text-left font-normal">
-                                            <CalendarIcon className="mr-2 h-4 w-4"/>
-                                            {format(editingTodo.deadline, "PPP")}
-                                        </Button>
-                                    </PopoverTrigger>
-                                    <PopoverContent className="w-auto p-0">
-                                        <Calendar
-                                            mode="single"
-                                            selected={editingTodo.deadline}
-                                            onSelect={date => date && updateEditingTodo('deadline', date)}
-                                            initialFocus
-                                        />
-                                    </PopoverContent>
-                                </Popover>
-                            </div>
-                            <div className="space-y-2">
-                                <Label>Category</Label>
-                                <Select defaultValue={editingTodo.category} onValueChange={value => updateEditingTodo('category', value)}>
-                                    <SelectTrigger>
-                                        <SelectValue />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        {categories.map(category => (
-                                            <SelectItem key={category} value={category}>{category}</SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
-                            </div>
+                            <Input
+                                type="date"
+                                value={deadline}
+                                onChange={(e) => setDeadline(e.target.value)}
+                                required
+                            />
                             <DialogFooter>
-                                <Button type="submit">Save Changes</Button>
+                                <Button type="submit">{editingTodo ? "Update" : "Add"} ToDo</Button>
                             </DialogFooter>
                         </form>
-                    )}
-                </DialogContent>
-            </Dialog>
+                    </DialogContent>
+                </Dialog>
+                <div className="space-y-4">
+                    {todos
+                        .sort((a, b) => (b.pinned ? 1 : -1))
+                        .map((todo) => (
+                            <div>
+                                <TaskItem
+                                    todo={todo}
+                                    handleTogglePin={handleTogglePin}
+                                />
 
-            <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-                <DialogContent>
-                    <DialogHeader>
-                        <DialogTitle>Delete Todo</DialogTitle>
-                        <DialogDescription>
-                            Are you sure you want to delete this todo? This action cannot be undone.
-                        </DialogDescription>
-                    </DialogHeader>
-                    <DialogFooter>
-                        <Button variant="outline" onClick={() => setIsDeleteDialogOpen(false)}>Cancel</Button>
-                        <Button variant="destructive" onClick={handleDeleteTodo}>Delete</Button>
-                    </DialogFooter>
-                </DialogContent>
-            </Dialog>
-
+                                <CardFooter className="flex justify-end space-x-2">
+                                    <Button variant="outline" size="icon" onClick={() => handleEdit(todo)}>
+                                        <PencilIcon className="h-4 w-4" />
+                                    </Button>
+                                    <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+                                        <AlertDialogTrigger asChild>
+                                            <Button variant="destructive" size="icon" onClick={() => handleDelete(todo)}>
+                                                <TrashIcon className="h-4 w-4" />
+                                            </Button>
+                                        </AlertDialogTrigger>
+                                        <AlertDialogContent>
+                                            <AlertDialogHeader>
+                                                <AlertDialogTitle>Are you sure you want to delete this ToDo?</AlertDialogTitle>
+                                                <AlertDialogDescription>
+                                                    This action cannot be undone. This will permanently delete the ToDo.
+                                                </AlertDialogDescription>
+                                            </AlertDialogHeader>
+                                            <AlertDialogFooter>
+                                                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                                <AlertDialogAction onClick={confirmDelete}>Delete</AlertDialogAction>
+                                            </AlertDialogFooter>
+                                        </AlertDialogContent>
+                                    </AlertDialog>
+                                </CardFooter>
+                            </div>
+                        ))}
+                </div>
+            </div>
             <Footer />
-        </div>
+        </>
     )
 }
