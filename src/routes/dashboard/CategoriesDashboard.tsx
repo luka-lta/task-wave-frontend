@@ -1,7 +1,7 @@
 import { useCategories } from '@/hooks/useCategories';
 import {useState} from "react";
 import {Category} from "@/types/Category.ts";
-import {Pencil, Plus, Trash2} from "lucide-react";
+import {Loader2, Pencil, Plus, Trash2} from "lucide-react";
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table.tsx";
 import {Button} from "@/components/ui/button.tsx";
 import {Badge} from "@/components/ui/badge.tsx";
@@ -24,57 +24,62 @@ export default function CategoriesPage() {
         <>
             <DashboardHeader title={'Categories'} />
             <div className='container mx-auto py-10'>
-
                 <Button onClick={() => setIsAddDialogOpen(true)} className="mb-4">
                     <Plus className="mr-2 h-4 w-4" /> Add Category
                 </Button>
-                <Table>
-                    <TableHeader>
-                        <TableRow>
-                            <TableHead>Name</TableHead>
-                            <TableHead>Description</TableHead>
-                            <TableHead>Color</TableHead>
-                            <TableHead className="text-right">Actions</TableHead>
-                        </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                        {categories.map(category => (
-                            <TableRow key={category.categoryId}>
-                                <TableCell>{category.name}</TableCell>
-                                <TableCell>{category.description}</TableCell>
-                                <TableCell>
-                                    <Badge style={{backgroundColor: `#${category.color}`}}>
-                                        #{category.color}
-                                    </Badge>
-                                </TableCell>
-                                <TableCell className="text-right">
-                                    <Button
-                                        variant="ghost"
-                                        size="sm"
-                                        onClick={() => {
-                                            setEditingCategory(category)
-                                            setIsEditDialogOpen(true)
-                                        }}
-                                    >
-                                        <Pencil className="h-4 w-4"/>
-                                        <span className="sr-only">Edit {category.name}</span>
-                                    </Button>
-                                    <Button
-                                        variant="ghost"
-                                        size="sm"
-                                        onClick={() => {
-                                            setDeletingCategoryId(category.categoryId)
-                                            setIsDeleteDialogOpen(true)
-                                        }}
-                                    >
-                                        <Trash2 className="h-4 w-4"/>
-                                        <span className="sr-only">Delete {category.name}</span>
-                                    </Button>
-                                </TableCell>
+                {isLoading ? (
+                    <div className="flex justify-center items-center h-64">
+                        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                    </div>
+                ) : (
+                    <Table>
+                        <TableHeader>
+                            <TableRow>
+                                <TableHead>Name</TableHead>
+                                <TableHead>Description</TableHead>
+                                <TableHead>Color</TableHead>
+                                <TableHead className="text-right">Actions</TableHead>
                             </TableRow>
-                        ))}
-                    </TableBody>
-                </Table>
+                        </TableHeader>
+                        <TableBody>
+                            {categories.map(category => (
+                                <TableRow key={category.categoryId}>
+                                    <TableCell>{category.name}</TableCell>
+                                    <TableCell>{category.description}</TableCell>
+                                    <TableCell>
+                                        <Badge style={{backgroundColor: `#${category.color}`}}>
+                                            #{category.color}
+                                        </Badge>
+                                    </TableCell>
+                                    <TableCell className="text-right">
+                                        <Button
+                                            variant="ghost"
+                                            size="sm"
+                                            onClick={() => {
+                                                setEditingCategory(category)
+                                                setIsEditDialogOpen(true)
+                                            }}
+                                        >
+                                            <Pencil className="h-4 w-4"/>
+                                            <span className="sr-only">Edit {category.name}</span>
+                                        </Button>
+                                        <Button
+                                            variant="ghost"
+                                            size="sm"
+                                            onClick={() => {
+                                                setDeletingCategoryId(category.categoryId)
+                                                setIsDeleteDialogOpen(true)
+                                            }}
+                                        >
+                                            <Trash2 className="h-4 w-4"/>
+                                            <span className="sr-only">Delete {category.name}</span>
+                                        </Button>
+                                    </TableCell>
+                                </TableRow>
+                            ))}
+                        </TableBody>
+                    </Table>
+                )}
 
                 <AddCategoryDialog
                     isOpen={isAddDialogOpen}

@@ -1,18 +1,18 @@
 import { useState, useEffect } from 'react';
 import { toast } from '@/components/ui/use-toast';
 import {useAuth} from "@/context/auth-context.tsx";
-import {Category} from "@/types/Category.ts";
+import {Task} from "@/types/Task.ts";
 
-export const useCategories = (initialCategories: Category[]) => {
-    const [categories, setCategories] = useState<Category[]>(initialCategories);
+export const useTasks = (initialTasks: Task[]) => {
+    const [tasks, setTasks] = useState<Task[]>(initialTasks);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const {user} = useAuth();
 
-    const fetchCategories = async () => {
+    const fetchTasks = async () => {
         setIsLoading(true);
         try {
-            const response = await fetch('http://localhost/api/v1/category/all', {
+            const response = await fetch('http://localhost/api/v1/task/all', {
                 method: 'GET',
                 headers: {
                     Authorization: `Bearer ${localStorage.getItem('token')}`,
@@ -20,10 +20,10 @@ export const useCategories = (initialCategories: Category[]) => {
                 }
             });
             if (!response.ok) {
-                throw new Error('Failed to fetch categories');
+                throw new Error('Failed to fetch tasks');
             }
             const data = await response.json();
-            setCategories(data.categories);
+            setTasks(data.tasks);
         } catch (err) {
             setError(err.message);
         } finally {
@@ -32,35 +32,49 @@ export const useCategories = (initialCategories: Category[]) => {
     };
 
     useEffect(() => {
-        fetchCategories().catch((err) => setError(err.message));
+        fetchTasks().catch((err) => setError(err.message));
     }, []);
 
-    const addCategory = async (name: string, description: string, color: string) => {
+    const addTask = async (
+        title: string,
+        description: string,
+        priority: string,
+        status: string,
+        pinned: boolean,
+        deadline: string,
+    ) => {
         setIsLoading(true);
         try {
-            const response = await fetch(`http://localhost/api/v1/category/create/${user.sub}`, {
+            const response = await fetch(`http://localhost/api/v1/task/create`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${localStorage.getItem('token')}`,
                 },
-                body: JSON.stringify({ name, description, color }),
+                body: JSON.stringify({
+                    title,
+                    description,
+                    priority,
+                    status,
+                    pinned,
+                    deadline,
+                }),
             });
             if (!response.ok) {
-                throw new Error('Failed to add category');
+                throw new Error('Failed to add task');
             }
 
             toast({
-                title: 'Category added',
-                description: `${name} has been added to your categories.`,
+                title: 'Task added',
+                description: `${title} has been added to your tasks.`,
             });
 
-            fetchCategories();
+            fetchTasks();
         } catch (err) {
             setError(err.message);
             toast({
                 title: 'Error',
-                description: 'There was an error adding the category.',
+                description: 'There was an error adding the task.',
                 variant: 'destructive',
             });
         } finally {
@@ -68,32 +82,32 @@ export const useCategories = (initialCategories: Category[]) => {
         }
     };
 
-    const editCategory = async (updatedCategory: Category) => {
+    const editTask = async (updatedTasks: Task) => {
         setIsLoading(true);
         try {
-            const response = await fetch(`http://localhost/api/v1/category/edit/${updatedCategory.categoryId}`, {
+            const response = await fetch(`http://localhost/api/v1/task/edit/${updatedTasks.todoId}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${localStorage.getItem('token')}`,
                 },
-                body: JSON.stringify(updatedCategory),
+                body: JSON.stringify(updatedTasks),
             });
             if (!response.ok) {
-                throw new Error('Failed to update category');
+                throw new Error('Failed to update task');
             }
-            setCategories((prev) =>
-                prev.map((category) => (category.categoryId === updatedCategory.categoryId ? updatedCategory : category))
+            setTasks((prev) =>
+                prev.map((task) => (task.todoId === updatedTasks.todoId ? updatedTasks : task))
             );
             toast({
-                title: 'Category updated',
-                description: `${updatedCategory.name} has been updated.`,
+                title: 'Task updated',
+                description: `${updatedTasks.title} has been updated.`,
             });
         } catch (err) {
             setError(err.message);
             toast({
                 title: 'Error',
-                description: 'There was an error updating the category.',
+                description: 'There was an error updating the task.',
                 variant: 'destructive',
             });
         } finally {
@@ -101,29 +115,29 @@ export const useCategories = (initialCategories: Category[]) => {
         }
     };
 
-    const deleteCategory = async (categoryId: number) => {
+    const deleteTask = async (taskId: number) => {
         setIsLoading(true);
         try {
-            const response = await fetch(`http://localhost/api/v1/category/delete/${categoryId}`, {
+            const response = await fetch(`http://localhost/api/v1/task/delete/${taskId}`, {
                 method: 'DELETE',
                 headers: {
                     'Authorization': `Bearer ${localStorage.getItem('token')}`,
                 }
             });
             if (!response.ok) {
-                throw new Error('Failed to delete category');
+                throw new Error('Failed to delete task');
             }
-            setCategories((prev) => prev.filter((category) => category.categoryId !== categoryId));
+            setTasks((prev) => prev.filter((task) => task.todoId !== taskId));
             toast({
-                title: 'Category deleted',
-                description: 'The category has been deleted.',
+                title: 'task deleted',
+                description: 'The task has been deleted.',
                 variant: 'destructive',
             });
         } catch (err) {
             setError(err.message);
             toast({
                 title: 'Error',
-                description: 'There was an error deleting the category.',
+                description: 'There was an error deleting the task.',
                 variant: 'destructive',
             });
         } finally {
@@ -132,11 +146,11 @@ export const useCategories = (initialCategories: Category[]) => {
     };
 
     return {
-        categories,
+        tasks,
         isLoading,
         error,
-        addCategory,
-        editCategory,
-        deleteCategory,
+        addTask,
+        editTask,
+        deleteTask,
     };
 };
