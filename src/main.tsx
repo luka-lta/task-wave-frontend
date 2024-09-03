@@ -5,7 +5,7 @@ import {createBrowserRouter, RouterProvider} from "react-router-dom";
 import Root from "./routes/root.tsx";
 import {ThemeProvider} from "@/components/theme-provider.tsx";
 import Login from "@/routes/Login.tsx";
-import TodoDashboard from "@/routes/dashboard/TodoDashboard.tsx";
+import TaskDashboard from "@/routes/dashboard/TaskDashboard.tsx";
 import CategoriesPage from "@/routes/dashboard/CategoriesDashboard.tsx";
 import ForgotPassword from "@/routes/forgot-password.tsx";
 import NewPassword from "@/routes/new-password.tsx";
@@ -32,7 +32,7 @@ const router = createBrowserRouter([
     },
     {
         path: '/dashboard',
-        element: <TodoDashboard/>,
+        element: <TaskDashboard/>,
     },
     {
         path: '/dashboard/categories',

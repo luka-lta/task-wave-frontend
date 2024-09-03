@@ -7,7 +7,6 @@ export const useTasks = (initialTasks: Task[]) => {
     const [tasks, setTasks] = useState<Task[]>(initialTasks);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
-    const {user} = useAuth();
 
     const fetchTasks = async () => {
         setIsLoading(true);
@@ -38,10 +37,10 @@ export const useTasks = (initialTasks: Task[]) => {
     const addTask = async (
         title: string,
         description: string,
+        deadline: string,
         priority: string,
         status: string,
         pinned: boolean,
-        deadline: string,
     ) => {
         setIsLoading(true);
         try {

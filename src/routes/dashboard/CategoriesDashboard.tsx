@@ -1,15 +1,15 @@
 import { useCategories } from '@/hooks/useCategories';
 import {useState} from "react";
 import {Category} from "@/types/Category.ts";
-import {Loader2, Pencil, Plus, Trash2} from "lucide-react";
-import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table.tsx";
+import {Loader2, Plus} from "lucide-react";
+import {Table, TableBody, TableHead, TableHeader, TableRow} from "@/components/ui/table.tsx";
 import {Button} from "@/components/ui/button.tsx";
-import {Badge} from "@/components/ui/badge.tsx";
 import {EditCategoryDialog} from "@/components/dialog/category/edit-category.tsx";
 import {DeleteCategoryDialog} from "@/components/dialog/category/delete-category.tsx";
 import DashboardHeader from "@/components/dashboard-header.tsx";
 import {Footer} from "@/components/footer.tsx";
 import AddCategoryDialog from "@/components/dialog/category/add-category.tsx";
+import CategoryItem from "@/components/items/CategoryItem.tsx";
 
 export default function CategoriesPage() {
     const { categories, isLoading, addCategory, editCategory, deleteCategory } = useCategories([]);
@@ -43,39 +43,14 @@ export default function CategoriesPage() {
                         </TableHeader>
                         <TableBody>
                             {categories.map(category => (
-                                <TableRow key={category.categoryId}>
-                                    <TableCell>{category.name}</TableCell>
-                                    <TableCell>{category.description}</TableCell>
-                                    <TableCell>
-                                        <Badge style={{backgroundColor: `#${category.color}`}}>
-                                            #{category.color}
-                                        </Badge>
-                                    </TableCell>
-                                    <TableCell className="text-right">
-                                        <Button
-                                            variant="ghost"
-                                            size="sm"
-                                            onClick={() => {
-                                                setEditingCategory(category)
-                                                setIsEditDialogOpen(true)
-                                            }}
-                                        >
-                                            <Pencil className="h-4 w-4"/>
-                                            <span className="sr-only">Edit {category.name}</span>
-                                        </Button>
-                                        <Button
-                                            variant="ghost"
-                                            size="sm"
-                                            onClick={() => {
-                                                setDeletingCategoryId(category.categoryId)
-                                                setIsDeleteDialogOpen(true)
-                                            }}
-                                        >
-                                            <Trash2 className="h-4 w-4"/>
-                                            <span className="sr-only">Delete {category.name}</span>
-                                        </Button>
-                                    </TableCell>
-                                </TableRow>
+                                <CategoryItem
+                                    category={category}
+                                    key={category.categoryId}
+                                    setEditingCategory={setEditingCategory}
+                                    setIsEditDialogOpen={setIsEditDialogOpen}
+                                    setDeletingCategoryId={setDeletingCategoryId}
+                                    setIsDeleteDialogOpen={setIsDeleteDialogOpen}
+                                />
                             ))}
                         </TableBody>
                     </Table>
