@@ -1,7 +1,9 @@
+import {Category} from "@/types/Category.ts";
+
 export interface Task {
     todoId: number
     ownerId: number
-    categoryId?: number
+    category?: Category
     title: string
     description?: string
     deadline?: Date

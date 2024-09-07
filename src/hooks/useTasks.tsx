@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import { toast } from '@/components/ui/use-toast';
-import {useAuth} from "@/context/auth-context.tsx";
 import {Task} from "@/types/Task.ts";
 
 export const useTasks = (initialTasks: Task[]) => {
@@ -22,7 +21,10 @@ export const useTasks = (initialTasks: Task[]) => {
                 throw new Error('Failed to fetch tasks');
             }
             const data = await response.json();
-            setTasks(data.tasks);
+            setTasks(data.tasks.map((task: Task) => ({
+                ...task,
+                category: task.category ? { ...task.category } : null
+            })));
         } catch (err) {
             setError(err.message);
         } finally {
@@ -36,6 +38,7 @@ export const useTasks = (initialTasks: Task[]) => {
 
     const addTask = async (
         title: string,
+        categoryId: number,
         description: string,
         deadline: string,
         priority: string,
@@ -57,6 +60,7 @@ export const useTasks = (initialTasks: Task[]) => {
                     status,
                     pinned,
                     deadline,
+                    categoryId,
                 }),
             });
             if (!response.ok) {

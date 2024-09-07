@@ -14,12 +14,14 @@ import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Switch } from "@/components/ui/switch"
 import {Textarea} from "@/components/ui/textarea.tsx";
+import {useCategories} from "@/hooks/useCategories.tsx";
 
 interface AddTaskDialogProps {
     isOpen: boolean
     onClose: () => void
     onAddTask: (
         title: string,
+        categoryId: number,
         description: string,
         deadline: string,
         priority: string,
@@ -38,11 +40,13 @@ export default function AddTaskDialog({
     const [formData, setFormData] = useState({
         title: '',
         description: '',
+        categoryId: 0,
         deadline: new Date().toISOString().split('T')[0],
         priority: 'NO-PRIORITY',
         status: 'ToDo',
         pinned: false,
     })
+    // const {category} = useCategories([]);
 
     const handleChange = (
         e: React.ChangeEvent<HTMLInputElement> |
@@ -61,12 +65,12 @@ export default function AddTaskDialog({
     }
 
     const handleAddTask = () => {
-        const { title, description, deadline, priority, status, pinned } = formData
+        const { title, categoryId, description, deadline, priority, status, pinned } = formData
         if (!title.trim()) {
             alert('Title is required')
             return
         }
-        onAddTask(title, description, deadline, priority, status, pinned)
+        onAddTask(title, categoryId, description, deadline, priority, status, pinned)
     }
 
     return (
@@ -90,6 +94,28 @@ export default function AddTaskDialog({
                             placeholder="Task title"
                             className="col-span-3"
                         />
+                    </div>
+                    <div className="grid grid-cols-4 items-center gap-4">
+                        <Label htmlFor="category" className="text-right">
+                            Category
+                        </Label>
+                        <Select
+                            value={formData.categoryId.toString()}
+                            onValueChange={handleSelectChange('priority')}
+                        >
+                            <SelectTrigger className="col-span-3">
+                                <SelectValue placeholder="Select priority" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {/*{*/}
+                                {/*    category.map((cat) => (*/}
+                                {/*        <SelectItem key={cat.categoryId} value={cat.categoryId.toString()}>*/}
+                                {/*            {cat.name}*/}
+                                {/*        </SelectItem>*/}
+                                {/*    ))*/}
+                                {/*}*/}
+                            </SelectContent>
+                        </Select>
                     </div>
                     <div className="grid grid-cols-4 items-center gap-4">
                         <Label htmlFor="description" className="text-right">
